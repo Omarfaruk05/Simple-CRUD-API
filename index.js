@@ -14,48 +14,68 @@ let users = [
 
 // Get all users
 app.get("/api/users", (req, res) => {
-  res.json(users);
+  try {
+    res.json(users);
+  } catch (error) {
+    res.status(400).json({ error });
+  }
 });
 
 // Get single user by ID
 app.get("/api/users/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-  const user = users.find((user) => user.id === id);
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
+  try {
+    const id = parseInt(req.params.id);
+    const user = users.find((user) => user.id === id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(400).json({ error });
   }
-  res.json(user);
 });
 
 // Create a new user
 app.post("/api/users", (req, res) => {
-  const { username, password } = req.body;
-  const newUser = { id: users.length + 1, username, password };
-  users.push(newUser);
-  res.status(201).json(newUser);
+  try {
+    const { username, password } = req.body;
+    const newUser = { id: users.length + 1, username, password };
+    users.push(newUser);
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.status(400).json({ error });
+  }
 });
 
 // Update a user
 app.put("/api/users/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-  const { username, password } = req.body;
-  const userIndex = users.findIndex((user) => user.id === id);
-  if (userIndex === -1) {
-    return res.status(404).json({ message: "User not found" });
+  try {
+    const id = parseInt(req.params.id);
+    const { username, password } = req.body;
+    const userIndex = users.findIndex((user) => user.id === id);
+    if (userIndex === -1) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    users[userIndex] = { id, username, password };
+    res.status(200).json(users[userIndex]);
+  } catch (error) {
+    res.status(400).json({ error });
   }
-  users[userIndex] = { id, username, password };
-  res.json(users[userIndex]);
 });
 
 // Delete a user
 app.delete("/api/users/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-  const userIndex = users.findIndex((user) => user.id === id);
-  if (userIndex === -1) {
-    return res.status(404).json({ message: "User not found" });
+  try {
+    const id = parseInt(req.params.id);
+    const userIndex = users.findIndex((user) => user.id === id);
+    if (userIndex === -1) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const deletedUser = users.splice(userIndex, 1);
+    res.status(200).json(deletedUser[0]);
+  } catch (error) {
+    res.status(400).json({ error });
   }
-  const deletedUser = users.splice(userIndex, 1);
-  res.json(deletedUser[0]);
 });
 
 // Start the server
